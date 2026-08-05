@@ -3,65 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <title>Detail Barang</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="header">DETAIL BARANG</div>
 
-<div class="container" id="detail">
-  <p>Loading...</p>
-</div>
+<div class="container" id="detail"></div>
 
 <script>
-const el = document.getElementById("detail");
+(async function () {
+  const el = document.getElementById("detail");
+  const kode = new URLSearchParams(window.location.search).get("kode");
 
-// ambil kode dari URL
-const kode = new URLSearchParams(window.location.search).get("kode");
+  const barang = await fetch("barang.json").then(r => r.json());
+  const lokasi = await fetch("lokasi.json").then(r => r.json());
+  const unit = await fetch("unit.json").then(r => r.json());
 
-fetch("barang.json")
-  .then(res => res.json())
-  .then(data => {
+  const item = barang.find(x => x.kode === kode);
+  const unitItem = unit.filter(u => u.kode_barang === kode);
 
-    console.log("KODE:", kode);
-    console.log("DATA:", data);
+  if (!item) {
+    el.innerHTML = "Data tidak ditemukan";
+    return;
+  }
 
-    // cari barang (lebih aman)
-    const item = data.find(x => 
-      x.kode.trim().toUpperCase() === kode.trim().toUpperCase()
-    );
-
-    console.log("ITEM:", item);
-
-    if (!item) {
-      el.innerHTML = "❌ Data tidak ditemukan: " + kode;
-      return;
-    }
-
-    el.innerHTML = `
-      <div class="card">
-        <img src="${item.gambar || 'https://via.placeholder.com/400x200'}">
+  el.innerHTML = `
+    <!-- TOP INFO -->
+    <div class="top-row">
+      <div class="box">
+        <small>Nama Barang</small>
+        <div>${item.nama}</div>
       </div>
-
-      <div class="card">
-        <h2>${item.nama}</h2>
-        <ul>
-          <li><b>Kode:</b> ${item.kode}</li>
-          <li><b>Brand:</b> ${item.brand}</li>
-          <li><b>Part:</b> ${item.part_number}</li>
-        </ul>
+      <div class="box">
+        <small>Kode Barang</small>
+        <div>${item.kode}</div>
       </div>
+    </div>
 
-      <div class="card">
-        <h2>Deskripsi</h2>
-        <p>${item.deskripsi}</p>
-      </div>
-    `;
-  })
-  .catch(err => {
-    console.error(err);
-    el.innerHTML = "❌ Gagal load data";
-  });
+    <!-- IMAGE -->
+    <div class="image-box">
+      <img src="${item.gambar || 'https://via.placeholder.com/400x200'}">
+    </div>
+
+    <!-- PART -->
+    <div class="field">
+      <small>Part Number</small>
+      <div>${item.part_number}</div>
+    </div>
+
+    <!-- BRAND -->
+    <div class="field">
+      <small>Brand</small>
+      <div>${item.brand}</div>
+    </div>
+
+    <!-- DESKRIPSI -->
+    <div class="big-box">
+      <small>Deskripsi</small>
+      <p>${item.deskripsi}</p>
+    </div>
+
+    <!-- UNIT -->
+    <div class="big-box">
+      <small>Unit</small>
+      ${
+        unitItem.length > 0
+        ? '<ul>' + unitItem.map(u => `<li>${u.nama_unit}</li>`).join('') + '</ul>'
+        : '<p>-</p>'
+      }
+    </div>
+  `;
+})();
 </script>
 
 </body>
