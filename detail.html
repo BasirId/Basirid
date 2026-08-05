@@ -1,53 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
   <title>Detail Barang</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="header">Detail Barang</div>
+<div class="header">
+  DETAIL BARANG
+</div>
 
 <div class="container" id="detail"></div>
 
-<script src="data.js"></script>
-
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-const kode = urlParams.get("kode");
+async function loadDetail() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const kode = params.get("kode");
 
-const item = dataBarang.find(d => d.kode === kode);
+    const [barangRes, lokasiRes, unitRes] = await Promise.all([
+      fetch('barang.json'),
+      fetch('lokasi.json'),
+      fetch('unit.json')
+    ]);
 
-const detail = document.getElementById("detail");
+    const barang = await barangRes.json();
+    const lokasi = await lokasiRes.json();
+    const unit = await unitRes.json();
 
-if (item) {
-  detail.innerHTML = `
-    <div class="card">
-      <img src="${item.gambar}">
-    </div>
+    const item = barang.find(b => b.kode === kode);
+    const lokasiItem = lokasi.find(l => l.kode === kode);
+    const unitItem = unit.filter(u => u.kode_barang === kode);
 
-    <div class="card">
-      <h2>${item.nama}</h2>
-      <p>Kode: ${item.kode}</p>
-      <p>Part: ${item.part}</p>
-      <p>Brand: ${item.brand}</p>
-    </div>
+    const container = document.getElementById("detail");
 
-    <div class="card">
-      <h3>Deskripsi</h3>
-      <p>${item.deskripsi}</p>
-    </div>
+    if (!item) {
+      container.innerHTML = "<p>Data tidak ditemukan</p>";
+      return;
+    }
 
-    <div class="card">
-      <h3>Kebutuhan</h3>
-      <ul>
-        ${item.kebutuhan.map(k => `<li>${k}</li>`).join("")}
-      </ul>
-    </div>
-  `;
-} else {
-  detail.innerHTML = "<h2>Data tidak ditemukan</h2>";
+    container.innerHTML = `
+      <div class="card">
+        <img src="${item.gambar || 'https://via.placeholder.com/400x200'}">
+      </div>
+
+      <div class="card">
+        <h2>${item.nama}</h2>
+        <ul>
+          <li><b>Kode:</b> ${item.kode}</li>
+          <li><b>Kategori:</b> ${item.kategori}</li>
+          <li><b>Brand:</b> ${item.brand}</li>
+          <li><b>Part Number:</b> ${item.part_number}</li>
+          <li><b>Status:</b> ${item.status}</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Deskripsi</h2>
+        <p>${item.deskripsi}</p>
+      </div>
+
+      <div class="card">
+        <h2>Lokasi</h2>
+        <p>${lokasiItem ? lokasiItem.nama_lokasi : 'Belum ada lokasi'}</p>
+      </div>
+
+      <div class="card">
+        <h2>Unit Terkait</h2>
+        ${
+          unitItem.length > 0
+          ? '<ul>' + unitItem.map(u => `<li>${u.nama_unit}</li>`).join('') + '</ul>'
+          : '<p>Tidak ada unit</p>'
+        }
+      </div>
+    `;
+  } catch (err) {
+    document.getElementById("detail").innerHTML = "<p>Error load data</p>";
+    console.error(err);
+  }
 }
+
+loadDetail();
 </script>
 
 </body>
