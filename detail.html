@@ -1,83 +1,70 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Detail Barang</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<!-- HEADER -->
-<div class="header">
-  <span onclick="history.back()">←</span>
-  <div>Detail Barang</div>
-</div>
-
-<!-- CONTENT -->
-<div class="content" id="detail"></div>
-
 <script>
 (async function () {
   const el = document.getElementById("detail");
   const kode = new URLSearchParams(location.search).get("kode");
 
-  const barang = await fetch("barang.json").then(r => r.json());
-  const unit = await fetch("unit.json").then(r => r.json());
+  try {
+    // LOAD BARANG
+    const barangRes = await fetch("barang.json");
+    const barang = await barangRes.json();
 
-  const item = barang.find(x => x.kode === kode);
-  const unitItem = unit.filter(u => u.kode_barang === kode);
+    // LOAD UNIT (AMAN)
+    let unit = [];
+    try {
+      const unitRes = await fetch("unit.json");
+      unit = await unitRes.json();
+    } catch (e) {
+      console.log("unit.json tidak ada, skip...");
+    }
 
-  if (!item) {
-    el.innerHTML = "<p>Data tidak ditemukan</p>";
-    return;
+    const item = barang.find(x => x.kode === kode);
+    const unitItem = unit.filter(u => u.kode_barang === kode);
+
+    if (!item) {
+      el.innerHTML = "<p>Data tidak ditemukan</p>";
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="row">
+        <div class="field">
+          <label>Nama Barang</label>
+          <div>${item.nama}</div>
+        </div>
+        <div class="field">
+          <label>Kode</label>
+          <div>${item.kode}</div>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Part Number</label>
+        <div>${item.part_number}</div>
+      </div>
+
+      <div class="field full">
+        <label>Brand</label>
+        <div>${item.brand}</div>
+      </div>
+
+      <div class="section">
+        <label>Deskripsi</label>
+        <p>${item.deskripsi}</p>
+      </div>
+
+      <div class="section">
+        <label>Unit</label>
+        ${
+          unitItem.length
+          ? '<ul>' + unitItem.map(u => `<li>${u.nama_unit}</li>`).join('') + '</ul>'
+          : '<p>-</p>'
+        }
+      </div>
+    `;
+
+  } catch (err) {
+    console.error(err);
+    el.innerHTML = "<p>Error load data</p>";
   }
-
-  el.innerHTML = `
-    <!-- NAMA + KODE -->
-    <div class="row">
-      <div class="field">
-        <label>Nama Barang</label>
-        <div>${item.nama}</div>
-      </div>
-      <div class="field">
-        <label>Kode</label>
-        <div>${item.kode}</div>
-      </div>
-    </div>
-
-    <!-- PART -->
-    <div class="field full">
-      <label>Part Number</label>
-      <div>${item.part_number}</div>
-    </div>
-
-    <!-- BRAND -->
-    <div class="field full">
-      <label>Brand</label>
-      <div>${item.brand}</div>
-    </div>
-
-    <!-- DESKRIPSI -->
-    <div class="section">
-      <label>Deskripsi</label>
-      <p>${item.deskripsi}</p>
-    </div>
-
-    <!-- UNIT -->
-    <div class="section">
-      <label>Unit</label>
-      ${
-        unitItem.length
-        ? '<ul>' + unitItem.map(u => `<li>${u.nama_unit}</li>`).join('') + '</ul>'
-        : '<p>-</p>'
-      }
-    </div>
-  `;
 })();
 </script>
-
-</body>
-</html>
