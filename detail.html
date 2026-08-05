@@ -1,100 +1,38 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Detail Barang</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<div class="header">
-  DETAIL BARANG
-</div>
-
-<div class="container" id="detail">
-  <p>Loading...</p>
-</div>
-
 <script>
 (async function () {
-  const container = document.getElementById("detail");
+  const el = document.getElementById("detail");
 
   try {
-    // ambil kode dari URL
-    const params = new URLSearchParams(window.location.search);
-    const kode = params.get("kode");
+    const kode = new URLSearchParams(location.search).get("kode");
 
-    console.log("KODE URL:", kode);
+    el.innerHTML = "Loading...<br>Kode: " + kode;
 
-    if (!kode) {
-      container.innerHTML = "❌ Kode tidak ditemukan di URL";
-      return;
-    }
-
-    // fetch semua data
     const barang = await fetch("barang.json").then(r => r.json());
-    const lokasi = await fetch("lokasi.json").then(r => r.json());
-    const unit = await fetch("unit.json").then(r => r.json());
 
-    console.log("DATA BARANG:", barang);
+    console.log("SEMUA DATA:", barang);
 
-    // cari barang
-    const item = barang.find(x => x.kode.trim() === kode.trim());
-
-    console.log("HASIL CARI:", item);
+    // tampilkan semua kode biar kelihatan
+    let semuaKode = barang.map(x => x.kode).join("<br>");
+    
+    const item = barang.find(x => String(x.kode).trim() === String(kode).trim());
 
     if (!item) {
-      container.innerHTML = "❌ Data tidak ditemukan untuk kode: " + kode;
+      el.innerHTML = `
+        ❌ DATA TIDAK KETEMU<br><br>
+        Kode dicari: ${kode}<br><br>
+        Semua kode di JSON:<br>${semuaKode}
+      `;
       return;
     }
 
-    // cari relasi
-    const lokasiItem = lokasi.find(l => l.kode === kode);
-    const unitItem = unit.filter(u => u.kode_barang === kode);
-
-    // render
-    container.innerHTML = `
-      <div class="card">
-        <img src="${item.gambar || 'https://via.placeholder.com/400x200'}">
-      </div>
-
-      <div class="card">
-        <h2>${item.nama}</h2>
-        <ul>
-          <li><b>Kode:</b> ${item.kode}</li>
-          <li><b>Kategori:</b> ${item.kategori}</li>
-          <li><b>Brand:</b> ${item.brand}</li>
-          <li><b>Part Number:</b> ${item.part_number}</li>
-          <li><b>Status:</b> ${item.status}</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>Deskripsi</h2>
-        <p>${item.deskripsi}</p>
-      </div>
-
-      <div class="card">
-        <h2>Lokasi</h2>
-        <p>${lokasiItem ? lokasiItem.nama_lokasi : 'Belum ada lokasi'}</p>
-      </div>
-
-      <div class="card">
-        <h2>Unit</h2>
-        ${
-          unitItem.length > 0
-          ? '<ul>' + unitItem.map(u => `<li>${u.nama_unit}</li>`).join('') + '</ul>'
-          : '<p>Tidak ada unit</p>'
-        }
-      </div>
+    el.innerHTML = `
+      <h2>${item.nama}</h2>
+      <p>${item.deskripsi}</p>
     `;
 
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = "❌ ERROR LOAD DATA";
+  } catch (e) {
+    el.innerHTML = "ERROR: " + e;
+    console.error(e);
   }
 })();
 </script>
-
-</body>
-</html>
