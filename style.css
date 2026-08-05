@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: Arial;
 }
 
 body {
@@ -13,81 +13,99 @@ body {
 
 /* HEADER */
 .header {
-  background: #111827;
-  padding: 18px;
   text-align: center;
-  font-size: 18px;
+  padding: 16px;
   font-weight: bold;
   border-bottom: 1px solid #333;
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
-/* CONTAINER FULL MOBILE */
+/* CONTAINER */
 .container {
   padding: 15px;
   max-width: 500px;
   margin: auto;
 }
 
-/* CARD */
-.card {
-  background: #1f2937;
-  padding: 18px;
-  border-radius: 16px;
+/* ROW ATAS */
+.top-row {
+  display: flex;
+  gap: 10px;
   margin-bottom: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.box {
+  flex: 1;
+  background: #1f2937;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.box small {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.box div {
+  font-size: 15px;
+  margin-top: 5px;
 }
 
 /* IMAGE */
-.card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 12px;
+.image-box {
+  background: #1f2937;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 15px;
 }
 
-/* TITLE */
-h2 {
-  font-size: 20px;
+.image-box img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* FIELD KECIL */
+.field {
+  background: #1f2937;
+  padding: 12px;
+  border-radius: 10px;
   margin-bottom: 10px;
+}
+
+.field small {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.field div {
+  margin-top: 5px;
+}
+
+/* BOX BESAR */
+.big-box {
+  background: #1f2937;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.big-box small {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.big-box p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* LIST */
 ul {
+  margin-top: 8px;
   padding-left: 18px;
 }
 
 li {
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-/* TEXT */
-p {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #d1d5db;
-}
-
-/* SECTION TITLE */
-.card h2 {
-  border-bottom: 1px solid #374151;
-  padding-bottom: 5px;
-}
-
-/* MOBILE FEEL */
-@media (max-width: 600px) {
-  .container {
-    padding: 12px;
-  }
-
-  .card {
-    padding: 16px;
-  }
-
-  h2 {
-    font-size: 18px;
-  }
+  margin-bottom: 5px;
 }
