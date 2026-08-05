@@ -1,38 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Detail Barang</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+  DETAIL BARANG
+</div>
+
+<div class="container" id="detail">
+  <p>Loading...</p>
+</div>
+
 <script>
 (async function () {
   const el = document.getElementById("detail");
 
+  // ambil kode dari URL
+  const kode = new URLSearchParams(window.location.search).get("kode");
+
+  console.log("KODE:", kode);
+
   try {
-    const kode = new URLSearchParams(location.search).get("kode");
+    // fetch barang.json
+    const res = await fetch("barang.json");
 
-    el.innerHTML = "Loading...<br>Kode: " + kode;
-
-    const barang = await fetch("barang.json").then(r => r.json());
-
-    console.log("SEMUA DATA:", barang);
-
-    // tampilkan semua kode biar kelihatan
-    let semuaKode = barang.map(x => x.kode).join("<br>");
-    
-    const item = barang.find(x => String(x.kode).trim() === String(kode).trim());
-
-    if (!item) {
-      el.innerHTML = `
-        ❌ DATA TIDAK KETEMU<br><br>
-        Kode dicari: ${kode}<br><br>
-        Semua kode di JSON:<br>${semuaKode}
-      `;
+    if (!res.ok) {
+      el.innerHTML = "❌ barang.json tidak ditemukan";
       return;
     }
 
+    const data = await res.json();
+
+    console.log("TOTAL DATA:", data.length);
+
+    // cari data
+    const item = data.find(x => x.kode === kode);
+
+    console.log("ITEM:", item);
+
+    if (!item) {
+      el.innerHTML = "❌ Data tidak ditemukan untuk: " + kode;
+      return;
+    }
+
+    // tampilkan
     el.innerHTML = `
-      <h2>${item.nama}</h2>
-      <p>${item.deskripsi}</p>
+      <div class="card">
+        <img src="${item.gambar || 'https://via.placeholder.com/400x200'}">
+      </div>
+
+      <div class="card">
+        <h2>${item.nama}</h2>
+        <ul>
+          <li><b>Kode:</b> ${item.kode}</li>
+          <li><b>Brand:</b> ${item.brand}</li>
+          <li><b>Part:</b> ${item.part_number}</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Deskripsi</h2>
+        <p>${item.deskripsi}</p>
+      </div>
     `;
 
-  } catch (e) {
-    el.innerHTML = "ERROR: " + e;
-    console.error(e);
+  } catch (err) {
+    console.error(err);
+    el.innerHTML = "❌ ERROR LOAD DATA";
   }
 })();
 </script>
+
+</body>
+</html>
