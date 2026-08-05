@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Detail Barang</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">DETAIL BARANG</div>
+
+<div class="container" id="detail">
+  <p>Loading...</p>
+</div>
+
+<script>
+const el = document.getElementById("detail");
+
+// ambil kode dari URL
+const kode = new URLSearchParams(window.location.search).get("kode");
+
+fetch("barang.json")
+  .then(res => res.json())
+  .then(data => {
+
+    console.log("KODE:", kode);
+    console.log("DATA:", data);
+
+    // cari barang (lebih aman)
+    const item = data.find(x => 
+      x.kode.trim().toUpperCase() === kode.trim().toUpperCase()
+    );
+
+    console.log("ITEM:", item);
+
+    if (!item) {
+      el.innerHTML = "❌ Data tidak ditemukan: " + kode;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="card">
+        <img src="${item.gambar || 'https://via.placeholder.com/400x200'}">
+      </div>
+
+      <div class="card">
+        <h2>${item.nama}</h2>
+        <ul>
+          <li><b>Kode:</b> ${item.kode}</li>
+          <li><b>Brand:</b> ${item.brand}</li>
+          <li><b>Part:</b> ${item.part_number}</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Deskripsi</h2>
+        <p>${item.deskripsi}</p>
+      </div>
+    `;
+  })
+  .catch(err => {
+    console.error(err);
+    el.innerHTML = "❌ Gagal load data";
+  });
+</script>
+
+</body>
+</html>
