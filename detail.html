@@ -1,70 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Detail Barang</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+<div class="logo">
+📦 Detail Barang
+</div>
+
+</header>
+
+<div class="container" id="detail">
+
+</div>
+
+<script src="data.js"></script>
+
 <script>
-(async function () {
-  const el = document.getElementById("detail");
-  const kode = new URLSearchParams(location.search).get("kode");
 
-  try {
-    // LOAD BARANG
-    const barangRes = await fetch("barang.json");
-    const barang = await barangRes.json();
+const urlParams = new URLSearchParams(window.location.search);
 
-    // LOAD UNIT (AMAN)
-    let unit = [];
-    try {
-      const unitRes = await fetch("unit.json");
-      unit = await unitRes.json();
-    } catch (e) {
-      console.log("unit.json tidak ada, skip...");
-    }
+const kode = urlParams.get("kode");
 
-    const item = barang.find(x => x.kode === kode);
-    const unitItem = unit.filter(u => u.kode_barang === kode);
+const item = dataBarang.find(d => d.kode === kode);
 
-    if (!item) {
-      el.innerHTML = "<p>Data tidak ditemukan</p>";
-      return;
-    }
+const detail = document.getElementById("detail");
 
-    el.innerHTML = `
-      <div class="row">
-        <div class="field">
-          <label>Nama Barang</label>
-          <div>${item.nama}</div>
-        </div>
-        <div class="field">
-          <label>Kode</label>
-          <div>${item.kode}</div>
-        </div>
-      </div>
+if(item){
 
-      <div class="field full">
-        <label>Part Number</label>
-        <div>${item.part_number}</div>
-      </div>
+const gambar =
+item.gambar && item.gambar !== ""
+?
+item.gambar
+:
+"images/no-image.png";
 
-      <div class="field full">
-        <label>Brand</label>
-        <div>${item.brand}</div>
-      </div>
+detail.innerHTML = `
 
-      <div class="section">
-        <label>Deskripsi</label>
-        <p>${item.deskripsi}</p>
-      </div>
+<div class="detail-card">
 
-      <div class="section">
-        <label>Unit</label>
-        ${
-          unitItem.length
-          ? '<ul>' + unitItem.map(u => `<li>${u.nama_unit}</li>`).join('') + '</ul>'
-          : '<p>-</p>'
-        }
-      </div>
-    `;
+<img
+class="detail-image"
+src="${gambar}"
+onerror="this.src='images/no-image.png'">
 
-  } catch (err) {
-    console.error(err);
-    el.innerHTML = "<p>Error load data</p>";
-  }
-})();
+<div class="detail-content">
+
+<h2>${item.nama}</h2>
+
+<table class="detail-table">
+
+<tr>
+<td><b>Kode</b></td>
+<td>${item.kode}</td>
+</tr>
+
+<tr>
+<td><b>Kategori</b></td>
+<td>${item.kategori}</td>
+</tr>
+
+<tr>
+<td><b>Part Number</b></td>
+<td>${item.part_number || "-"}</td>
+</tr>
+
+<tr>
+<td><b>Brand</b></td>
+<td>${item.brand || "-"}</td>
+</tr>
+
+<tr>
+<td><b>Lokasi</b></td>
+<td>${item.lokasi || "-"}</td>
+</tr>
+
+<tr>
+<td><b>Status</b></td>
+<td>
+
+<span class="status ${item.status}">
+${item.status}
+</span>
+
+</td>
+</tr>
+
+</table>
+
+<div class="deskripsi">
+
+<h3>Deskripsi</h3>
+
+<p>
+
+${item.deskripsi || "-"}
+
+</p>
+
+</div>
+
+<div class="deskripsi">
+
+<h3>Digunakan Pada Unit</h3>
+
+${
+item.unit.length
+?
+
+`
+<ul>
+
+${item.unit.map(u=>`
+
+<li>${u}</li>
+
+`).join("")}
+
+</ul>
+
+`
+
+:
+
+"<p>Belum ada data unit.</p>"
+
+}
+
+</div>
+
+<br>
+
+<a
+href="index.html"
+class="btn">
+
+← Kembali
+
+</a>
+
+</div>
+
+</div>
+
+`;
+
+}else{
+
+detail.innerHTML=`
+
+<div class="detail-card">
+
+<div class="detail-content">
+
+<h2>Data Tidak Ditemukan</h2>
+
+<p>
+
+Kode barang tidak tersedia.
+
+</p>
+
+<br>
+
+<a
+href="index.html"
+class="btn">
+
+← Kembali
+
+</a>
+
+</div>
+
+</div>
+
+`;
+
+}
+
 </script>
+
+</body>
+</html>
