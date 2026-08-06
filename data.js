@@ -1,53 +1,31 @@
-async function loadData() {
-  try {
-    const [barangRes, lokasiRes, unitRes] = await Promise.all([
-      fetch('barang.json'),
-      fetch('lokasi.json'),
-      fetch('unit.json')
-    ]);
+const dataBarang = [
 
-    const barang = await barangRes.json();
-    const lokasi = await lokasiRes.json();
-    const unit = await unitRes.json();
+{
+  "kode": "APD-001",
+  "kategori": "APD",
+  "nama": "Topeng Gerinda",
+  "part_number": "-",
+  "brand": "Wipro",
+  "deskripsi": "Topeng pelindung wajah untuk pekerjaan gerinda yang melindungi mata dan wajah dari percikan dan serpihan material.",
+  "status": "aktif",
+  "lokasi": "",
+  "gambar": "",
+  "unit": []
+},
 
-    const dataGabung = barang.map(item => {
-      return {
-        ...item,
-        lokasi_detail: lokasi.find(l => l.kode === item.kode),
-        unit_detail: unit.filter(u => u.kode_barang === item.kode)
-      };
-    });
-
-    renderData(dataGabung);
-
-  } catch (err) {
-    document.getElementById('feed').innerHTML = "<p>Gagal load data</p>";
-    console.error(err);
-  }
+{
+  "kode": "APD-002",
+  "kategori": "APD",
+  "nama": "Safety Shoes",
+  "part_number": "Uk 5",
+  "brand": "Krusher",
+  "deskripsi": "Sepatu keselamatan ukuran 5 dengan pelindung ujung kaki (steel toe) untuk melindungi kaki dari benturan dan benda tajam.",
+  "status": "aktif",
+  "lokasi": "",
+  "gambar": "",
+  "unit": []
 }
 
-function renderData(data) {
-  const feed = document.getElementById('feed');
-  feed.innerHTML = "";
+/* data berikutnya */
 
-  data.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'post';
-
-    div.innerHTML = `
-      <img src="${item.gambar || 'https://via.placeholder.com/400x200'}" class="post-img">
-      <div class="post-body">
-        <h3>${item.nama}</h3>
-        <p>${item.brand} • ${item.part_number}</p>
-      </div>
-    `;
-
-    div.onclick = () => {
-      window.location.href = "detail.html?kode=" + item.kode;
-    };
-
-    feed.appendChild(div);
-  });
-}
-
-loadData();
+];
